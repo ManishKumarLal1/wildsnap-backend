@@ -53,4 +53,9 @@ router.post("/resend-verification", resendVerificationEmail);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 
+router.get(
+  "/verify-email-link",
+  authController.verifyEmailLink
+);
+
 module.exports = router;

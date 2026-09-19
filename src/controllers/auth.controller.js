@@ -245,6 +245,19 @@ async function resetPassword(req, res) {
     });
   }
 }
+
+async function verifyEmailLink(req, res) {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).send("Verification token is missing.");
+  }
+
+  const appUrl =
+    `wildsnap://verify-email?token=${encodeURIComponent(token)}`;
+
+  return res.redirect(appUrl);
+}
 module.exports = {
   register,
   login,
@@ -254,4 +267,5 @@ module.exports = {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
+  verifyEmailLink,
 };
