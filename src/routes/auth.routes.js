@@ -9,6 +9,7 @@ const {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
+  verifyEmailLink,
 } = require("../controllers/auth.controller");
 
 const authenticate = require("../middleware/auth.middleware");
@@ -54,8 +55,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 
 router.get(
-  "/verify-email-link",
-  authController.verifyEmailLink
+  "/verify-email-link", authController.verifyEmailLink
 );
 
 module.exports = router;
