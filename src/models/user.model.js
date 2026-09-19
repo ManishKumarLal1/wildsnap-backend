@@ -8,6 +8,7 @@ async function findUserByEmail(email) {
       username,
       email,
       password_hash,
+      email_verified,
       avatar,
       xp,
       level,
@@ -24,7 +25,6 @@ async function findUserByEmail(email) {
 
   return result.rows[0] || null;
 }
-
 async function findUserByUsername(username) {
   const result = await pool.query(
     `
@@ -33,6 +33,7 @@ async function findUserByUsername(username) {
       username,
       email,
       password_hash,
+      email_verified,
       avatar,
       xp,
       level,
@@ -171,22 +172,6 @@ async function verifyEmail(token) {
   );
 
   return result.rows[0] || null;
-}
-
-async function setPasswordResetToken(userId, token, expiresAt) {
-  const result = await pool.query(
-    `
-    UPDATE users
-    SET password_reset_token = $1,
-        password_reset_token_expires = $2,
-        updated_at = CURRENT_TIMESTAMP
-    WHERE id = $3
-    RETURNING id
-    `,
-    [token, expiresAt, userId]
-  );
-
-  return result.rows[0];
 }
 
 async function resetPasswordWithToken(token, newPasswordHash) {
