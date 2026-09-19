@@ -3,8 +3,8 @@ const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendVerificationEmail(email, username, token) {
-  const verificationUrl =
-    `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+ const verificationUrl =
+  `wildsnap://verify-email?token=${encodeURIComponent(token)}`;
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM,
@@ -52,8 +52,8 @@ async function sendVerificationEmail(email, username, token) {
 }
 
 async function sendPasswordResetEmail(email, username, token) {
-  const resetUrl =
-    `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+ const resetUrl =
+  `wildsnap://reset-password?token=${encodeURIComponent(token)}`;
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM,
