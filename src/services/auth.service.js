@@ -38,7 +38,6 @@ const {
 const { validatePassword } = require("../utils/passwordValidator");
 
 async function register({ username, email, password }) {
-
   const passwordErrors = validatePassword(password);
 
   if (passwordErrors.length > 0) {
@@ -49,11 +48,44 @@ async function register({ username, email, password }) {
 
   const existingEmail = await findUserByEmail(email);
 
+  // Email already exists
   if (existingEmail) {
-    throw new Error("EMAIL_ALREADY_EXISTS");
+
+    // Already verified → don't allow another registration
+    if (existingEmail.email_verified) {
+      throw new Error("EMAIL_ALREADY_EXISTS");
+    }
+
+    // Existing account but email is NOT verified
+    const verificationToken = generateVerificationToken();
+
+    // New token expires in 15 minutes
+    const expiresAt = new Date(
+      Date.now() + 15 * 60 * 1000
+    );
+
+    // Replace old token with new token
+    await setVerificationToken(
+      existingEmail.id,
+      verificationToken,
+      expiresAt
+    );
+
+    // Send new verification email
+    await sendVerificationEmail(
+      existingEmail.email,
+      existingEmail.username,
+      verificationToken
+    );
+
+    return {
+      user: existingEmail,
+      verificationResent: true,
+    };
   }
 
-  const existingUsername = await findUserByUsername(username);
+  const existingUsername =
+    await findUserByUsername(username);
 
   if (existingUsername) {
     throw new Error("USERNAME_ALREADY_EXISTS");
@@ -68,10 +100,13 @@ async function register({ username, email, password }) {
   });
 
   // Generate verification token
-  const verificationToken = generateVerificationToken();
+  const verificationToken =
+    generateVerificationToken();
 
   // Token expires in 15 minutes
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  const expiresAt = new Date(
+    Date.now() + 15 * 60 * 1000
+  );
 
   // Save token in database
   await setVerificationToken(
@@ -89,6 +124,7 @@ async function register({ username, email, password }) {
 
   return {
     user,
+    verificationResent: false,
   };
 }
 

@@ -10,11 +10,20 @@ async function register(req, res) {
       password,
     });
 
+    if (result.verificationResent) {
+      return res.status(200).json({
+        message:
+          "This email is already registered but not verified. A new verification email has been sent.",
+        user: result.user,
+      });
+    }
+
     return res.status(201).json({
       message:
         "Account created successfully. Please check your email to verify your account.",
       user: result.user,
     });
+
   } catch (error) {
     if (error.message === "EMAIL_ALREADY_EXISTS") {
       return res.status(409).json({
@@ -47,7 +56,6 @@ async function register(req, res) {
     });
   }
 }
-
 async function login(req, res) {
   try {
     const { identifier, password } = req.body;
